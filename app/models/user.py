@@ -12,7 +12,6 @@ class User(Base):
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
     
-    # Relationships
     cart_items = relationship("CartItem", back_populates="user")
     purchases = relationship("Purchase", back_populates="user")
     comments = relationship("Comment", back_populates="user") 
