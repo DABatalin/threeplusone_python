@@ -14,6 +14,5 @@ class Comment(Base):
     product_id = Column(Integer, ForeignKey("product.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    # Relationships
     user = relationship("User", back_populates="comments")
     product = relationship("Product", back_populates="comments") 
