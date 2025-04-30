@@ -34,39 +34,21 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Настройте переменные окружения в файле `.env`:
-```bash
-# PostgreSQL
-POSTGRES_SERVER=localhost
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=ecommerce
-POSTGRES_PORT=5432
-
-# JWT
-SECRET_KEY=your-secret-key
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# S3
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-S3_BUCKET_NAME=your-bucket-name
-
-# Elasticsearch
-ELASTICSEARCH_HOST=localhost
-ELASTICSEARCH_PORT=9200
-
-# Kafka
-KAFKA_BOOTSTRAP_SERVERS=localhost:9092
-```
-
-4. Запустите сервисы с помощью Docker:
+3. Запустите сервисы с помощью Docker:
 ```bash
 docker-compose up -d
 ```
+Возможно, для запуска придется включить впн, чтобы скачать образы
+
+4. Удалите папку alembic и файл alembic.ini, но сохраните содержимое файла alembic/env.py и alembic.ini. После выполнения команды ниже:
+```bash
+alembic init alembic
+```
+Замените создавшиеся файлы env.py и alembic.ini на те, которые вы сохранили заранее.
 
 5. Выполните миграции базы данных:
 ```bash
+alembic revision --autogenerate -m "init migration"
 alembic upgrade head
 ```
 
