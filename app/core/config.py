@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import PostgresDsn, SecretStr
+from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings
 
 
@@ -22,9 +22,13 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
-    AWS_ACCESS_KEY_ID: str = ""
-    AWS_SECRET_ACCESS_KEY: SecretStr = SecretStr("")
-    S3_BUCKET_NAME: str = ""
+    # MinIO settings
+    MINIO_ROOT_USER: str = "minioadmin"
+    MINIO_ROOT_PASSWORD: str = "minioadmin"
+    MINIO_HOST: str = "localhost"
+    MINIO_PORT: int = 9000
+    MINIO_BUCKET_NAME: str = "product-images"
+    MINIO_USE_SSL: bool = False
     
     ELASTICSEARCH_HOST: str = "localhost"
     ELASTICSEARCH_PORT: int = 9200
@@ -34,6 +38,7 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
         env_file = ".env"
+        extra = "allow"
 
 
 settings = Settings() 

@@ -18,3 +18,4 @@ class Product(Base):
     cart_items = relationship("CartItem", back_populates="product")
     purchase_items = relationship("PurchaseItem", back_populates="product")
     comments = relationship("Comment", back_populates="product") 
+    
