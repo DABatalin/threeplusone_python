@@ -1,95 +1,159 @@
-# Платформа аналитики электронной коммерции
+# E-commerce Analytics Platform
 
-## Обзор проекта
-Платформа электронной коммерции с аналитическими возможностями, построенная на FastAPI, PostgreSQL, Elasticsearch, Kafka и ClickHouse.
+Платформа электронной коммерции с аналитическими возможностями, построенная на FastAPI.
 
-### Функциональность
+## Основные возможности
+
 - Аутентификация и авторизация пользователей
-- Управление товарами с операциями CRUD
-- Функционал корзины покупок
-- Поиск товаров с использованием Elasticsearch
-- Хранение изображений с использованием S3
-- Аналитический конвейер с Kafka и ClickHouse
-- Обработка данных с помощью Apache Spark
+- Управление товарами и продавцами
+- Система корзины покупок
+- Комментарии к товарам
+- Хранение изображений товаров в MinIO
+- Поиск по товарам, продавцам и комментариям через Elasticsearch
+- Аналитика с использованием ClickHouse и Apache Kafka
 
-### Технологический стек
-- **Бэкенд**: FastAPI
+## Технологический стек
+
+- **Backend**: FastAPI, Python 3.11
 - **База данных**: PostgreSQL
+- **Хранение изображений**: MinIO
 - **Поиск**: Elasticsearch
-- **Очередь сообщений**: Kafka
+- **Очереди сообщений**: Apache Kafka
 - **Аналитика**: ClickHouse
-- **Хранилище**: S3
-- **Обработка данных**: Apache Spark
+- **Контейнеризация**: Docker, Docker Compose
 
-## Инструкции по установке
+## Начало работы
 
-1. Создайте и активируйте виртуальное окружение:
+### Предварительные требования
+
+- Docker и Docker Compose
+- Python 3.11 или выше
+- Git
+
+### Установка и запуск
+
+1. Клонируйте репозиторий:
 ```bash
-python3.11 -m venv venv
-source venv/bin/activate
+git clone <repository-url>
+cd project_python
 ```
 
-2. Установите зависимости:
+2. Создайте файл `.env` в корневой директории проекта со следующим содержимым:
+```env
+PROJECT_NAME=E-commerce Analytics Platform
+API_V1_STR=/api/v1
+
+POSTGRES_SERVER=db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=ecommerce
+POSTGRES_PORT=5432
+
+SECRET_KEY=your-secret-key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# MinIO settings
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+MINIO_HOST=minio
+MINIO_PORT=9000
+MINIO_BUCKET_NAME=product-images
+MINIO_USE_SSL=false
+
+ELASTICSEARCH_HOST=elasticsearch
+ELASTICSEARCH_PORT=9200
+
+KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+```
+
+3. Запустите сервисы с помощью Docker Compose:
+```bash
+docker-compose up --build
+```
+
+4. После запуска будут доступны следующие сервисы:
+- API: http://localhost:8000
+- Swagger документация: http://localhost:8000/docs
+- MinIO консоль: http://localhost:9001 (login: minioadmin, password: minioadmin)
+
+## Структура проекта
+
+```
+app/
+├── api/              # API endpoints
+│   └── v1/          # API версии 1
+├── core/            # Основные настройки и конфигурация
+├── crud/            # CRUD операции
+├── db/              # Настройки базы данных
+├── models/          # SQLAlchemy модели
+├── schemas/         # Pydantic схемы
+└── services/        # Сервисные слои (S3, Elasticsearch и т.д.)
+```
+
+## API Endpoints
+
+### Аутентификация
+- `POST /api/v1/auth/login` - Вход в систему
+- `POST /api/v1/auth/signup` - Регистрация
+
+### Товары
+- `GET /api/v1/products` - Список товаров
+- `POST /api/v1/products` - Создание товара
+- `GET /api/v1/products/{id}` - Получение товара
+- `PUT /api/v1/products/{id}` - Обновление товара
+- `DELETE /api/v1/products/{id}` - Удаление товара
+- `POST /api/v1/products/{id}/image` - Загрузка изображения товара
+
+### Корзина
+- `GET /api/v1/cart` - Просмотр корзины
+- `POST /api/v1/cart` - Добавление товара в корзину
+- `DELETE /api/v1/cart/{id}` - Удаление товара из корзины
+
+### Покупки
+- `POST /api/v1/purchases` - Оформление покупки
+- `GET /api/v1/purchases` - История покупок
+
+## Работа с изображениями
+
+Система использует MinIO для хранения изображений товаров. Изображения хранятся в бакете `product-images` со следующей структурой:
+```
+product-images/
+└── products/
+    └── {product_id}/
+        └── {uuid}.{extension}
+```
+
+### Загрузка изображений
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/products/{id}/image" \
+  -H "Authorization: Bearer {token}" \
+  -F "file=@/path/to/image.jpg"
+```
+
+## Разработка
+
+### Установка зависимостей для разработки
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Запустите сервисы с помощью Docker:
+### Запуск тестов
 ```bash
-docker-compose up -d
-```
-Возможно, для запуска придется включить впн, чтобы скачать образы
-
-4. Удалите папку alembic и файл alembic.ini, но сохраните содержимое файла alembic/env.py и alembic.ini. После выполнения команды ниже:
-```bash
-alembic init alembic
-```
-Замените создавшиеся файлы env.py и alembic.ini на те, которые вы сохранили заранее.
-
-5. Выполните миграции базы данных:
-```bash
-alembic revision --autogenerate -m "init migration"
-alembic upgrade head
+pytest
 ```
 
-6. Запустите приложение:
+### Форматирование кода
 ```bash
-uvicorn app.main:app --reload
+black .
+isort .
+flake8
 ```
 
-## Структура проекта
-```
-.
-├── app/
-│   ├── api/
-│   │   └── v1/
-│   │       ├── endpoints/
-│   │       └── router.py
-│   │   
-│   ├── core/
-│   │   ├── config.py
-│   │   └── security.py
-│   │   
-│   ├── db/
-│   │   ├── base.py
-│   │   └── session.py
-│   │   
-│   ├── models/
-│   │   └── __init__.py
-│   │   
-│   ├── schemas/
-│   │   └── __init__.py
-│   │   
-│   └── services/
-│   │       └── __init__.py
-│   ├── alembic/
-│   ├── tests/
-│   ├── .env
-│   ├── .gitignore
-│   ├── docker-compose.yml
-│   ├── Dockerfile
-│   └── requirements.txt
-```
+## Лицензия
+
+[MIT License](LICENSE)
 
 ## Команда
 1. Климов Иван - тимлид, аналитик

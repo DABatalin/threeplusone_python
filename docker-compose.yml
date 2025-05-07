@@ -14,10 +14,15 @@ services:
       - POSTGRES_DB=ecommerce
       - ELASTICSEARCH_HOST=elasticsearch
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
     depends_on:
       - db
       - elasticsearch
       - kafka
+      - minio
 
   db:
     image: postgres:15
@@ -31,7 +36,7 @@ services:
       - "5432:5432"
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    image: elasticsearch:8.11.0
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -56,7 +61,20 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
 
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+    command: server --console-address ":9001" /data
+
 volumes:
   postgres_data:
   elasticsearch_data:
-  kafka_data: 
+  kafka_data:
+  minio_data: 

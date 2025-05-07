@@ -1,6 +1,7 @@
 from typing import Any, List
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_active_superuser, get_current_user
@@ -8,6 +9,7 @@ from app.crud.crud_product import product
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.product import Product, ProductCreate, ProductUpdate
+from app.services.s3 import s3_service
 
 router = APIRouter()
 
@@ -41,6 +43,51 @@ async def create_product(
     current_user: User = Depends(get_current_active_superuser),
 ) -> Any:
     product_obj = await product.create(db, obj_in=product_in)
+    return product_obj
+
+
+@router.post("/{id}/image", response_model=Product)
+async def upload_product_image(
+    *,
+    db: AsyncSession = Depends(get_db),
+    id: int,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_active_superuser),
+) -> Any:
+    """
+    Upload an image for a specific product
+    """
+    product_obj = await product.get(db, id=id)
+    if not product_obj:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Проверяем тип файла
+    if not file.content_type.startswith('image/'):
+        raise HTTPException(status_code=400, detail="File must be an image")
+    
+    # Генерируем уникальное имя файла
+    file_extension = file.filename.split(".")[-1] if "." in file.filename else ""
+    object_name = f"products/{id}/{uuid4()}.{file_extension}"
+    
+    # Если у продукта уже есть изображение, удаляем его
+    if product_obj.image_url:
+        try:
+            old_object_name = product_obj.image_url.split("/")[-1]
+            s3_service.delete_file(f"products/{id}/{old_object_name}")
+        except Exception:
+            pass  # Игнорируем ошибки при удалении старого файла
+    
+    # Загружаем новое изображение
+    content_type = file.content_type or "application/octet-stream"
+    image_url = await s3_service.upload_file(file, object_name, content_type)
+    
+    # Обновляем URL изображения в базе данных
+    product_obj = await product.update(
+        db, 
+        db_obj=product_obj, 
+        obj_in=ProductUpdate(image_url=image_url)
+    )
+    
     return product_obj
 
 
@@ -81,5 +128,14 @@ async def delete_product(
     product_obj = await product.get(db, id=id)
     if not product_obj:
         raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Удаляем изображение из S3, если оно есть
+    if product_obj.image_url:
+        try:
+            object_name = product_obj.image_url.split("/")[-1]
+            s3_service.delete_file(f"products/{id}/{object_name}")
+        except Exception:
+            pass  # Игнорируем ошибки при удалении файла
+    
     product_obj = await product.remove(db, id=id)
     return product_obj 

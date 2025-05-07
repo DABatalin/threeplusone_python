@@ -32,8 +32,13 @@ httpx==0.25.1
 # Validation
 pydantic==2.5.1
 pydantic-settings==2.1.0
+email-validator==2.1.0
 
 # Development
 black==23.11.0
 flake8==6.1.0
-isort==5.12.0 
+isort==5.12.0
+
+# MinIO
+minio>=7.2.0
+python-multipart  
