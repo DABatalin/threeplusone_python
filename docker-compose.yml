@@ -23,6 +23,8 @@ services:
       - elasticsearch
       - kafka
       - minio
+    networks:
+      - app_network
 
   db:
     image: postgres:15
@@ -34,9 +36,11 @@ services:
       - POSTGRES_DB=ecommerce
     ports:
       - "5432:5432"
+    networks:
+      - app_network
 
   elasticsearch:
-    image: elasticsearch:8.11.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -45,6 +49,8 @@ services:
       - "9200:9200"
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - app_network
 
   kafka:
     image: confluentinc/cp-kafka:7.5.1
@@ -60,6 +66,8 @@ services:
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
     volumes:
       - kafka_data:/var/lib/kafka/data
+    networks:
+      - app_network
 
   minio:
     image: minio/minio
@@ -72,6 +80,12 @@ services:
     volumes:
       - minio_data:/data
     command: server --console-address ":9001" /data
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
 
 volumes:
   postgres_data:

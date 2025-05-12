@@ -21,6 +21,7 @@ boto3==1.29.3
 
 # Elasticsearch
 elasticsearch==8.11.0
+elasticsearch-dsl==8.11.0
 
 # Kafka
 kafka-python==2.0.2

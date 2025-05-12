@@ -1,4 +1,5 @@
 from typing import Optional
+import os
 
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings
@@ -30,8 +31,11 @@ class Settings(BaseSettings):
     MINIO_BUCKET_NAME: str = "product-images"
     MINIO_USE_SSL: bool = False
     
-    ELASTICSEARCH_HOST: str = "localhost"
-    ELASTICSEARCH_PORT: int = 9200
+    # Elasticsearch settings
+    ELASTICSEARCH_HOST = os.getenv("ELASTICSEARCH_HOST", "localhost")
+    ELASTICSEARCH_PORT = int(os.getenv("ELASTICSEARCH_PORT", 9200))
+    ELASTICSEARCH_USERNAME = os.getenv("ELASTICSEARCH_USERNAME", "")
+    ELASTICSEARCH_PASSWORD = os.getenv("ELASTICSEARCH_PASSWORD", "")
     
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
     
