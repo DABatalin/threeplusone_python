@@ -1,0 +1,10 @@
+columns format version: 1
+8 columns:
+`sale_id` UInt32
+`product_id` UInt32
+`user_id` UInt32
+`seller_id` UInt32
+`quantity` UInt32
+`sale_price` Decimal(10, 2)
+`sale_date` DateTime
+`created_at` DateTime

@@ -1,0 +1,8 @@
+columns format version: 1
+6 columns:
+`rating_id` UInt32
+`seller_id` UInt32
+`user_id` UInt32
+`rating` UInt8
+`rating_date` DateTime
+`created_at` DateTime
