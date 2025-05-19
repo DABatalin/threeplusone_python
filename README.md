@@ -11,6 +11,7 @@
 - Хранение изображений товаров в MinIO
 - Поиск по товарам, продавцам и комментариям через Elasticsearch
 - Аналитика с использованием ClickHouse и Apache Kafka
+- Мониторинг системы через Prometheus и Grafana
 
 ## Технологический стек
 
@@ -20,6 +21,7 @@
 - **Поиск**: Elasticsearch
 - **Очереди сообщений**: Apache Kafka
 - **Аналитика**: ClickHouse
+- **Мониторинг**: Prometheus, Grafana
 - **Контейнеризация**: Docker, Docker Compose
 
 ## Начало работы
@@ -76,6 +78,27 @@ docker-compose up --build
 - API: http://localhost:8000
 - Swagger документация: http://localhost:8000/docs
 - MinIO консоль: http://localhost:9001 (login: minioadmin, password: minioadmin)
+- Grafana: http://localhost:3000 (login: admin, password: admin)
+- Prometheus: http://localhost:9090
+
+## Мониторинг
+
+Система включает в себя комплексный мониторинг с использованием Prometheus и Grafana:
+
+### Prometheus
+- Собирает метрики приложения
+- Доступен по адресу http://localhost:9090
+- Настроен на сбор метрик FastAPI приложения
+
+### Grafana
+- Доступна по адресу http://localhost:3000
+- Логин: admin
+- Пароль: admin
+- Предустановленные дашборды:
+  - Application_info 
+  - Request_info
+
+Дашборды хранятся в формате JSON в директории `grafana/dashboards/json/` и автоматически загружаются при старте Grafana.
 
 ## Структура проекта
 

@@ -3,7 +3,6 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
-# Use async PostgreSQL driver
 SQLALCHEMY_DATABASE_URL = settings.SQLALCHEMY_DATABASE_URI.replace(
     "postgresql://", "postgresql+asyncpg://"
 )
