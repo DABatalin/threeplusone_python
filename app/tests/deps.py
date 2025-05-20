@@ -1,21 +1,27 @@
-from typing import AsyncGenerator
+import asyncio
+from typing import AsyncGenerator, Generator
 
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from app.core.config import settings
 from app.db.base import Base
 
-SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///"
+# Use SQLite for testing
+SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+
 engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
+    connect_args={"check_same_thread": False},
 )
-
 TestingSessionLocal = sessionmaker(
-    engine, class_=AsyncSession, expire_on_commit=False
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
 )
 
-async def init_test_db():
+async def init_test_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
