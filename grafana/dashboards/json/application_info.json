@@ -18,14 +18,14 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 1,
+    "id": null,
     "links": [],
     "liveNow": false,
     "panels": [
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "f037e8f0-0cda-44e6-90db-082b49645f2c"
+          "uid": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -103,7 +103,7 @@
           {
             "datasource": {
               "type": "prometheus",
-              "uid": "f037e8f0-0cda-44e6-90db-082b49645f2c"
+              "uid": "prometheus"
             },
             "disableTextWrap": false,
             "editorMode": "builder",
@@ -123,7 +123,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "f037e8f0-0cda-44e6-90db-082b49645f2c"
+          "uid": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -173,7 +173,7 @@
           {
             "datasource": {
               "type": "prometheus",
-              "uid": "f037e8f0-0cda-44e6-90db-082b49645f2c"
+              "uid": "prometheus"
             },
             "disableTextWrap": false,
             "editorMode": "builder",
@@ -193,7 +193,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "f037e8f0-0cda-44e6-90db-082b49645f2c"
+          "uid": "prometheus"
         },
         "fieldConfig": {
           "defaults": {
@@ -247,7 +247,7 @@
           {
             "datasource": {
               "type": "prometheus",
-              "uid": "f037e8f0-0cda-44e6-90db-082b49645f2c"
+              "uid": "prometheus"
             },
             "disableTextWrap": false,
             "editorMode": "builder",
