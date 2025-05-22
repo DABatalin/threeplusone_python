@@ -37,6 +37,37 @@ ENV/
 *.log
 
 # Local development
-.DS_Store
-.coverage
-htmlcov/ metabase.jar
+.env
+.env.local
+
+# Docker
+.docker/
+
+# Database
+*.sqlite3
+*.db
+
+# Metabase
+metabase/metabase.jar
+metabase-data/
+
+# Spark
+spark/jars/
+spark/logs/
+
+# Airflow
+airflow/logs/
+airflow/*.pid
+airflow/*.err
+airflow/*.out
+airflow.cfg
+airflow.db
+
+# ClickHouse
+clickhouse/data/
+
+# MinIO
+minio/data/
+
+# Kafka
+kafka/data/
