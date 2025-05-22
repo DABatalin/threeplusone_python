@@ -1,9 +1,0 @@
-columns format version: 1
-7 columns:
-`product_id` UInt32
-`category_id` UInt32
-`seller_id` UInt32
-`product_name` String
-`price` Decimal(10, 2)
-`rating` Float32
-`created_at` DateTime

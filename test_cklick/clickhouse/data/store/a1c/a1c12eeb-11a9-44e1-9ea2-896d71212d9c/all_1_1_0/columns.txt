@@ -1,8 +1,0 @@
-columns format version: 1
-6 columns:
-`price_id` UInt32
-`product_id` UInt32
-`price` Decimal(10, 2)
-`effective_from` DateTime
-`effective_to` DateTime
-`created_at` DateTime

@@ -42,3 +42,6 @@ isort==5.12.0
 # MinIO
 minio>=7.2.0
 python-multipart  
+
+clickhouse-driver==0.2.6
+faker==19.13.0 

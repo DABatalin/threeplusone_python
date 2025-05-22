@@ -1,6 +1,0 @@
-columns format version: 1
-4 columns:
-`user_id` UInt32
-`username` String
-`registration_date` Date
-`created_at` DateTime

@@ -1,0 +1,30 @@
+version: '3'
+services:
+  metabase:
+    image: metabase/metabase:latest
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE: "postgres" # Используем PostgreSQL
+      MB_DB_HOST: "postgres_metabase" # имя сервиса базы данных
+      MB_DB_USER: "metabase"
+      MB_DB_PASS: "password"
+      MB_DB_NAME: "metabase"
+      ports: "5433:5432"
+    volumes:
+      - metabase-data:/metabase.db
+
+  postgres_metabase:
+    image: postgres:latest
+    platform: linux/arm64
+    environment:
+      POSTGRES_DB: "metabase"
+      POSTGRES_USER: "metabase"
+      POSTGRES_PASSWORD: "password"
+      ports: "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  metabase-data:
+  postgres-data:

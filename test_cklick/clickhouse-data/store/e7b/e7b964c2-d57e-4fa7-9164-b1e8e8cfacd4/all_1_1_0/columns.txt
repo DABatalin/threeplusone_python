@@ -1,6 +1,0 @@
-columns format version: 1
-4 columns:
-`seller_id` UInt32
-`seller_name` String
-`registration_date` Date
-`created_at` DateTime
