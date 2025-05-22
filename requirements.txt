@@ -26,6 +26,12 @@ elasticsearch==8.11.0
 kafka-python==2.0.2
 confluent-kafka==2.3.0
 
+# Spark and Airflow
+pyspark==3.5.0
+apache-airflow==2.7.3
+apache-airflow-providers-apache-spark==4.1.5
+requests==2.31.0
+
 # Testing
 pytest==7.4.3
 httpx==0.25.1

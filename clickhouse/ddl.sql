@@ -87,4 +87,23 @@ CREATE TABLE IF NOT EXISTS cart_items (
     status Enum8('in_cart' = 1, 'purchased' = 2, 'abandoned' = 3),
     created_at DateTime DEFAULT now()
 ) ENGINE = MergeTree()
-ORDER BY (added_at, cart_item_id); 
+ORDER BY (added_at, cart_item_id);
+
+-- Aggregation tables
+CREATE TABLE IF NOT EXISTS daily_sales_aggregation (
+    date Date,
+    total_sales UInt32,
+    total_quantity UInt32,
+    total_revenue Decimal(15,2),
+    created_at DateTime DEFAULT now()
+) ENGINE = MergeTree()
+ORDER BY date;
+
+CREATE TABLE IF NOT EXISTS user_activity_aggregation (
+    user_id UInt32,
+    total_sessions UInt32,
+    total_clicks UInt32,
+    avg_clicks_per_session Float32,
+    created_at DateTime DEFAULT now()
+) ENGINE = MergeTree()
+ORDER BY user_id; 

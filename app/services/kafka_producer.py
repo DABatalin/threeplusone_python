@@ -6,9 +6,14 @@ settings = Settings()
 
 class KafkaProducerService:
     def __init__(self):
+        # Use Docker service name when running in container
+        kafka_host = "kafka:29092" if "localhost" in settings.KAFKA_BOOTSTRAP_SERVERS else settings.KAFKA_BOOTSTRAP_SERVERS
+        
         self.producer = Producer({
-            'bootstrap.servers': settings.KAFKA_BOOTSTRAP_SERVERS,
-            'client.id': 'ecommerce-user-actions'
+            'bootstrap.servers': kafka_host,
+            'client.id': 'ecommerce-user-actions',
+            'request.timeout.ms': 5000,
+            'message.timeout.ms': 5000
         })
         self.topic = 'user_actions'
 

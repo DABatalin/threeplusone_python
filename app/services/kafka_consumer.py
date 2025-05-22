@@ -1,4 +1,5 @@
 import json
+import time
 from typing import Dict, Any
 from datetime import datetime
 from confluent_kafka import Consumer, KafkaError
@@ -12,11 +13,17 @@ class KafkaConsumerService:
         self.consumer = Consumer({
             'bootstrap.servers': settings.KAFKA_BOOTSTRAP_SERVERS,
             'group.id': 'ecommerce-clickhouse-consumer',
-            'auto.offset.reset': 'earliest'
+            'auto.offset.reset': 'earliest',
+            'session.timeout.ms': 6000,
+            'heartbeat.interval.ms': 2000
         })
         self.topic = 'user_actions'
+        
+        # Use Docker service names when running in container
+        clickhouse_host = "clickhouse" if settings.CLICKHOUSE_HOST == "localhost" else settings.CLICKHOUSE_HOST
+        
         self.clickhouse_client = Client(
-            host=settings.CLICKHOUSE_HOST,
+            host=clickhouse_host,
             port=settings.CLICKHOUSE_PORT
         )
         
@@ -54,31 +61,46 @@ class KafkaConsumerService:
         """
         Start consuming messages from Kafka
         """
-        try:
-            self.consumer.subscribe([self.topic])
-            
-            while True:
-                msg = self.consumer.poll(1.0)
+        max_retries = 5
+        retry_delay = 5  # seconds
+        
+        for attempt in range(max_retries):
+            try:
+                print(f"Attempting to connect to Kafka (attempt {attempt + 1}/{max_retries})...")
+                self.consumer.subscribe([self.topic])
                 
-                if msg is None:
-                    continue
-                if msg.error():
-                    if msg.error().code() == KafkaError._PARTITION_EOF:
-                        continue
-                    else:
-                        print(f"Consumer error: {msg.error()}")
-                        break
-                
-                try:
-                    # Parse message value
-                    message = json.loads(msg.value().decode('utf-8'))
-                    self.process_message(message)
-                except json.JSONDecodeError as e:
-                    print(f"Error decoding message: {e}")
-                except Exception as e:
-                    print(f"Error processing message: {e}")
+                while True:
+                    msg = self.consumer.poll(1.0)
                     
-        except Exception as e:
-            print(f"Error in consumer loop: {e}")
-        finally:
-            self.consumer.close() 
+                    if msg is None:
+                        continue
+                    if msg.error():
+                        if msg.error().code() == KafkaError._PARTITION_EOF:
+                            continue
+                        else:
+                            print(f"Consumer error: {msg.error()}")
+                            break
+                    
+                    try:
+                        # Parse message value
+                        message = json.loads(msg.value().decode('utf-8'))
+                        self.process_message(message)
+                    except json.JSONDecodeError as e:
+                        print(f"Error decoding message: {e}")
+                    except Exception as e:
+                        print(f"Error processing message: {e}")
+                        
+            except Exception as e:
+                print(f"Error in consumer loop: {e}")
+                if attempt < max_retries - 1:
+                    print(f"Retrying in {retry_delay} seconds...")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                else:
+                    print("Max retries reached. Exiting...")
+                    break
+            finally:
+                try:
+                    self.consumer.close()
+                except Exception as e:
+                    print(f"Error closing consumer: {e}") 
