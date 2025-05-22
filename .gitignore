@@ -39,4 +39,4 @@ ENV/
 # Local development
 .DS_Store
 .coverage
-htmlcov/ 
+htmlcov/ metabase.jar
