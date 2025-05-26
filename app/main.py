@@ -5,6 +5,7 @@ from prometheus_client import make_asgi_app
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.middleware import PrometheusMiddleware
+from app.services.elasticsearch import elasticsearch_service
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -24,11 +25,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Монтируем метрики после middleware
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+@app.on_event("startup")
+async def startup_event():
+    await elasticsearch_service.init_indices()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await elasticsearch_service.close()
 
 @app.get("/")
 async def root():
