@@ -12,88 +12,88 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=ecommerce
-      - ELASTICSEARCH_HOST=elasticsearch
+      # - ELASTICSEARCH_HOST=elasticsearch
       - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - MINIO_HOST=minio
-      - MINIO_PORT=9000
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+      # - MINIO_HOST=minio
+      # - MINIO_PORT=9000
+      # - MINIO_ROOT_USER=minioadmin
+      # - MINIO_ROOT_PASSWORD=minioadmin
       - CLICKHOUSE_HOST=clickhouse
       - CLICKHOUSE_PORT=8123
     depends_on:
       - db
-      - elasticsearch
-      - kafka
-      - minio
+      # - elasticsearch
+      # - kafka
+      # - minio
       - clickhouse
 
-  consumer:
-    build: .
-    command: ./scripts/run_consumer.sh
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - CLICKHOUSE_HOST=clickhouse
-      - CLICKHOUSE_PORT=8123
-    depends_on:
-      - kafka
-      - clickhouse
+  # consumer:
+  #   build: .
+  #   command: ./scripts/run_consumer.sh
+  #   environment:
+  #     - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+  #     - CLICKHOUSE_HOST=clickhouse
+  #     - CLICKHOUSE_PORT=8123
+  #   depends_on:
+  #     - kafka
+  #     - clickhouse
 
-  spark-master:
-    image: bitnami/spark:3.5
-    environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    ports:
-      - "8080:8080"
-      - "7077:7077"
-    volumes:
-      - ./spark/jobs:/opt/spark/jobs
-      - ./spark/jars:/opt/spark/jars
+  # spark-master:
+  #   image: bitnami/spark:3.5
+  #   environment:
+  #     - SPARK_MODE=master
+  #     - SPARK_RPC_AUTHENTICATION_ENABLED=no
+  #     - SPARK_RPC_ENCRYPTION_ENABLED=no
+  #     - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+  #     - SPARK_SSL_ENABLED=no
+  #   ports:
+  #     - "8080:8080"
+  #     - "7077:7077"
+  #   volumes:
+  #     - ./spark/jobs:/opt/spark/jobs
+  #     - ./spark/jars:/opt/spark/jars
 
-  spark-worker:
-    image: bitnami/spark:3.5
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    volumes:
-      - ./spark/jobs:/opt/spark/jobs
-      - ./spark/jars:/opt/spark/jars
-    depends_on:
-      - spark-master
+  # spark-worker:
+  #   image: bitnami/spark:3.5
+  #   environment:
+  #     - SPARK_MODE=worker
+  #     - SPARK_MASTER_URL=spark://spark-master:7077
+  #     - SPARK_WORKER_MEMORY=1G
+  #     - SPARK_WORKER_CORES=1
+  #     - SPARK_RPC_AUTHENTICATION_ENABLED=no
+  #     - SPARK_RPC_ENCRYPTION_ENABLED=no
+  #     - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+  #     - SPARK_SSL_ENABLED=no
+  #   volumes:
+  #     - ./spark/jobs:/opt/spark/jobs
+  #     - ./spark/jars:/opt/spark/jars
+  #   depends_on:
+  #     - spark-master
 
-  airflow:
-    image: apache/airflow:2.7.3
-    environment:
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-db/airflow
-      - AIRFLOW__CORE__LOAD_EXAMPLES=no
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-    ports:
-      - "8081:8080"
-    depends_on:
-      - airflow-db
-      - spark-master
+  # airflow:
+  #   image: apache/airflow:2.7.3
+  #   environment:
+  #     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  #     - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-db/airflow
+  #     - AIRFLOW__CORE__LOAD_EXAMPLES=no
+  #   volumes:
+  #     - ./airflow/dags:/opt/airflow/dags
+  #     - ./airflow/logs:/opt/airflow/logs
+  #     - ./airflow/plugins:/opt/airflow/plugins
+  #   ports:
+  #     - "8081:8080"
+  #   depends_on:
+  #     - airflow-db
+  #     - spark-master
 
-  airflow-db:
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
-    volumes:
-      - airflow-db-data:/var/lib/postgresql/data
+  # airflow-db:
+  #   image: postgres:15
+  #   environment:
+  #     - POSTGRES_USER=airflow
+  #     - POSTGRES_PASSWORD=airflow
+  #     - POSTGRES_DB=airflow
+  #   volumes:
+  #     - airflow-db-data:/var/lib/postgresql/data
 
   db:
     image: postgres:15
@@ -106,16 +106,16 @@ services:
     ports:
       - "5432:5432"
 
-  elasticsearch:
-    image: elasticsearch:8.11.0
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ports:
-      - "9200:9200"
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
+  # elasticsearch:
+  #   image: elasticsearch:8.11.0
+  #   environment:
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=false
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #   ports:
+  #     - "9200:9200"
+  #   volumes:
+  #     - elasticsearch_data:/usr/share/elasticsearch/data
 
   kafka:
     image: confluentinc/cp-kafka:7.5.1
@@ -132,17 +132,17 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
 
-  minio:
-    image: minio/minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
-    volumes:
-      - minio_data:/data
-    command: server --console-address ":9001" /data
+  # minio:
+  #   image: minio/minio
+  #   ports:
+  #     - "9000:9000"
+  #     - "9001:9001"
+  #   environment:
+  #     - MINIO_ROOT_USER=minioadmin
+  #     - MINIO_ROOT_PASSWORD=minioadmin
+  #   volumes:
+  #     - minio_data:/data
+  #   command: server --console-address ":9001" /data
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
@@ -157,37 +157,37 @@ services:
         soft: 262144
         hard: 262144
 
-  metabase:
-    image: metabase/metabase:latest
-    ports:
-      - "3000:3000"
-    environment:
-      MB_DB_TYPE: "postgres"
-      MB_DB_HOST: "metabase_db"
-      MB_DB_USER: "metabase"
-      MB_DB_PASS: "metabase123"
-      MB_DB_NAME: "metabase"
-    volumes:
-      - metabase-data:/metabase.db
-    depends_on:
-      - metabase_db
-      - clickhouse
+  # metabase:
+  #   image: metabase/metabase:latest
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     MB_DB_TYPE: "postgres"
+  #     MB_DB_HOST: "metabase_db"
+  #     MB_DB_USER: "metabase"
+  #     MB_DB_PASS: "metabase123"
+  #     MB_DB_NAME: "metabase"
+  #   volumes:
+  #     - metabase-data:/metabase.db
+  #   depends_on:
+  #     - metabase_db
+  #     - clickhouse
 
-  metabase_db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: "metabase"
-      POSTGRES_USER: "metabase"
-      POSTGRES_PASSWORD: "metabase123"
-    volumes:
-      - metabase-postgres-data:/var/lib/postgresql/data
+  # metabase_db:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_DB: "metabase"
+  #     POSTGRES_USER: "metabase"
+  #     POSTGRES_PASSWORD: "metabase123"
+  #   volumes:
+  #     - metabase-postgres-data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
-  elasticsearch_data:
+  # elasticsearch_data:
   kafka_data:
-  minio_data:
+  # minio_data:
   clickhouse_data:
-  metabase-data:
-  metabase-postgres-data:
-  airflow-db-data: 
+  # metabase-data:
+  # metabase-postgres-data:
+  # airflow-db-data: 

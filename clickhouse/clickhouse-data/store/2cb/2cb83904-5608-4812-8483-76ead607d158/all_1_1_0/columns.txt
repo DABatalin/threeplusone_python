@@ -1,8 +1,0 @@
-columns format version: 1
-6 columns:
-`session_id` UInt32
-`user_id` UInt32
-`session_start` DateTime
-`session_end` DateTime
-`click_count` UInt32
-`created_at` DateTime
