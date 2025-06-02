@@ -39,4 +39,8 @@ ENV/
 # Local development
 .DS_Store
 .coverage
-htmlcov/ 
+htmlcov/
+
+# SQLite databases
+*.db
+test.db 
