@@ -10,7 +10,6 @@ def create_spark_session():
             .getOrCreate())
 
 def sync_table(spark, table_name, postgres_props, clickhouse_props, last_sync_time):
-    # Read new/updated records from PostgreSQL
     query = f"""
     SELECT * FROM {table_name} 
     WHERE created_at >= '{last_sync_time}'
@@ -27,7 +26,6 @@ def sync_table(spark, table_name, postgres_props, clickhouse_props, last_sync_ti
           .load())
     
     if df.count() > 0:
-        # Write to ClickHouse
         (df.write
          .format("jdbc")
          .option("driver", "com.clickhouse.jdbc.ClickHouseDriver")
@@ -43,7 +41,6 @@ def sync_table(spark, table_name, postgres_props, clickhouse_props, last_sync_ti
         print(f"No new records to sync for table {table_name}")
 
 def main():
-    # Configuration
     postgres_props = {
         "url": "jdbc:postgresql://db:5432/ecommerce",
         "user": "postgres",
@@ -54,7 +51,6 @@ def main():
         "url": "jdbc:clickhouse://clickhouse:8123/ecommerce"
     }
     
-    # Tables to sync
     tables = [
         "users",
         "products",
@@ -66,7 +62,6 @@ def main():
         "cart_items"
     ]
     
-    # Get last sync time (1 hour ago by default)
     last_sync_time = (datetime.now() - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
     
     spark = create_spark_session()

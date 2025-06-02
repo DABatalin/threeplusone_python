@@ -9,7 +9,7 @@ def create_spark_session():
             .getOrCreate())
 
 def aggregate_sales_data(spark, clickhouse_props):
-    # Read from ClickHouse
+
     sales_df = (spark.read
                 .format("jdbc")
                 .option("driver", "com.clickhouse.jdbc.ClickHouseDriver")
@@ -19,7 +19,6 @@ def aggregate_sales_data(spark, clickhouse_props):
                 .option("password", clickhouse_props.get("password", ""))
                 .load())
     
-    # Daily sales aggregation
     daily_sales = (sales_df
                   .groupBy(window(col("sale_date"), "1 day"))
                   .agg(
@@ -28,7 +27,6 @@ def aggregate_sales_data(spark, clickhouse_props):
                       sum(col("price_at_sale") * col("quantity")).alias("total_revenue")
                   ))
     
-    # Write daily aggregations to ClickHouse
     (daily_sales.write
      .format("jdbc")
      .option("driver", "com.clickhouse.jdbc.ClickHouseDriver")
@@ -40,7 +38,6 @@ def aggregate_sales_data(spark, clickhouse_props):
      .save())
 
 def aggregate_user_activity(spark, clickhouse_props):
-    # Read from ClickHouse
     sessions_df = (spark.read
                   .format("jdbc")
                   .option("driver", "com.clickhouse.jdbc.ClickHouseDriver")
@@ -50,7 +47,6 @@ def aggregate_user_activity(spark, clickhouse_props):
                   .option("password", clickhouse_props.get("password", ""))
                   .load())
     
-    # User activity aggregation
     user_activity = (sessions_df
                     .groupBy("user_id")
                     .agg(
@@ -59,7 +55,6 @@ def aggregate_user_activity(spark, clickhouse_props):
                         avg("click_count").alias("avg_clicks_per_session")
                     ))
     
-    # Write user activity aggregations to ClickHouse
     (user_activity.write
      .format("jdbc")
      .option("driver", "com.clickhouse.jdbc.ClickHouseDriver")

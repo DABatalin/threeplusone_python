@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS categories (
 ) ENGINE = MergeTree()
 ORDER BY category_id;
 
+
 CREATE TABLE IF NOT EXISTS sellers (
     seller_id UInt32,
     seller_name String,
@@ -89,7 +90,7 @@ CREATE TABLE IF NOT EXISTS cart_items (
 ) ENGINE = MergeTree()
 ORDER BY (added_at, cart_item_id);
 
--- Aggregation tables
+
 CREATE TABLE IF NOT EXISTS daily_sales_aggregation (
     date Date,
     total_sales UInt32,

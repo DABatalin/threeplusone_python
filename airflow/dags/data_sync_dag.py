@@ -18,10 +18,8 @@ def check_data_quality():
     """
     Simple data quality check function
     """
-    # Check ClickHouse connection and data consistency
     clickhouse_url = "http://clickhouse:8123"
     
-    # Example queries to check data quality
     queries = [
         "SELECT count(*) FROM ecommerce.sales",
         "SELECT count(*) FROM ecommerce.user_sessions",
@@ -43,7 +41,6 @@ def check_data_quality():
         except Exception as e:
             raise Exception(f"Data quality check failed: {str(e)}")
 
-# Create DAG for incremental sync and aggregation
 with DAG(
     'data_sync_and_aggregation',
     default_args=default_args,
@@ -52,7 +49,6 @@ with DAG(
     catchup=False
 ) as dag:
 
-    # Incremental sync task
     sync_task = SparkSubmitOperator(
         task_id='incremental_sync',
         application='/opt/spark/jobs/incremental_sync.py',
@@ -63,7 +59,6 @@ with DAG(
         }
     )
 
-    # Data aggregation task
     aggregation_task = SparkSubmitOperator(
         task_id='data_aggregation',
         application='/opt/spark/jobs/data_aggregation.py',
@@ -74,16 +69,13 @@ with DAG(
         }
     )
 
-    # Data quality check task
     quality_check = PythonOperator(
         task_id='data_quality_check',
         python_callable=check_data_quality
     )
 
-    # Define task dependencies
     sync_task >> aggregation_task >> quality_check
 
-# Create DAG for historical data migration (runs once)
 with DAG(
     'historical_data_migration',
     default_args=default_args,
@@ -92,7 +84,6 @@ with DAG(
     catchup=False
 ) as historical_dag:
 
-    # Historical migration task
     migration_task = SparkSubmitOperator(
         task_id='historical_migration',
         application='/opt/spark/jobs/historical_migration.py',
@@ -103,11 +94,9 @@ with DAG(
         }
     )
 
-    # Data quality check task
     migration_quality_check = PythonOperator(
         task_id='migration_quality_check',
         python_callable=check_data_quality
     )
 
-    # Define task dependencies
     migration_task >> migration_quality_check 

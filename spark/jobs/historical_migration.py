@@ -9,7 +9,6 @@ def create_spark_session():
             .getOrCreate())
 
 def migrate_table(spark, table_name, postgres_props, clickhouse_props):
-    # Read from PostgreSQL
     df = (spark.read
           .format("jdbc")
           .option("driver", "org.postgresql.Driver")
@@ -19,11 +18,9 @@ def migrate_table(spark, table_name, postgres_props, clickhouse_props):
           .option("password", postgres_props["password"])
           .load())
     
-    # Add created_at timestamp if not exists
     if "created_at" not in df.columns:
         df = df.withColumn("created_at", current_timestamp())
     
-    # Write to ClickHouse
     (df.write
      .format("jdbc")
      .option("driver", "com.clickhouse.jdbc.ClickHouseDriver")
@@ -35,7 +32,6 @@ def migrate_table(spark, table_name, postgres_props, clickhouse_props):
      .save())
 
 def main():
-    # Configuration
     postgres_props = {
         "url": "jdbc:postgresql://db:5432/ecommerce",
         "user": "postgres",
@@ -46,7 +42,6 @@ def main():
         "url": "jdbc:clickhouse://clickhouse:8123/ecommerce"
     }
     
-    # Tables to migrate
     tables = [
         "users",
         "products",

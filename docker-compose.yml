@@ -147,8 +147,8 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     ports:
-      - "8123:8123"  # HTTP interface
-      - "9090:9000"  # Native interface
+      - "8123:8123"
+      - "9090:9000"  
     volumes:
       - ./clickhouse/ddl.sql:/docker-entrypoint-initdb.d/init.sql
       - clickhouse_data:/var/lib/clickhouse
