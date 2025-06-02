@@ -11,7 +11,6 @@ from app.tests.utils import (
     get_user_token_headers
 )
 
-# Override the dependencies
 app.dependency_overrides[get_db] = get_test_db
 
 client = TestClient(app)
@@ -26,7 +25,6 @@ def user_token_headers(setup_db):
     return get_user_token_headers(client)
 
 def test_add_to_cart(user_token_headers):
-    # Since we can't create products (not a superuser), we'll test with a non-existent product
     response = client.post(
         "/api/v1/cart/",
         headers=user_token_headers,
@@ -51,7 +49,6 @@ def test_add_nonexistent_product(user_token_headers):
     assert "not found" in response.json()["detail"]
 
 def test_read_cart(user_token_headers):
-    # Just read the empty cart
     response = client.get(
         "/api/v1/cart/",
         headers=user_token_headers
@@ -62,7 +59,6 @@ def test_read_cart(user_token_headers):
     assert len(data) == 0
 
 def test_update_cart_item(user_token_headers):
-    # Since we can't create products (not a superuser), we'll test with a non-existent product
     response = client.put(
         "/api/v1/cart/999999",
         headers=user_token_headers,
@@ -81,7 +77,6 @@ def test_update_nonexistent_cart_item(user_token_headers):
     assert "not found" in response.json()["detail"]
 
 def test_remove_from_cart(user_token_headers):
-    # Since we can't create products (not a superuser), we'll test with a non-existent product
     response = client.delete(
         "/api/v1/cart/999999",
         headers=user_token_headers

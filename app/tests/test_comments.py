@@ -11,7 +11,6 @@ from app.tests.utils import (
     get_user_token_headers
 )
 
-# Override the dependencies
 app.dependency_overrides[get_db] = get_test_db
 
 client = TestClient(app)
@@ -66,7 +65,7 @@ def test_create_comment_invalid_rating(user_token_headers):
         json={
             "product_id": 1,
             "text": "Great product!",
-            "rating": 6  # Rating should be between 1 and 5
+            "rating": 6 
         }
     )
     assert response.status_code == 422

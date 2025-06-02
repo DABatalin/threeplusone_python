@@ -7,7 +7,6 @@ from app.main import app
 from app.api.deps import get_db
 from app.tests.deps import get_test_db, init_test_db
 
-# Override the dependencies
 app.dependency_overrides[get_db] = get_test_db
 
 client = TestClient(app)
