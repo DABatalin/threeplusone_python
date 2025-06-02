@@ -1,14 +1,12 @@
-import asyncio
 from typing import AsyncGenerator, Generator
-
+import asyncio
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-
-from app.core.config import settings
 from app.db.base import Base
+from app.core.config import settings
 
-# Use SQLite for testing
+
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 
 engine = create_async_engine(

@@ -11,8 +11,8 @@ downloads/
 eggs/
 .eggs/
 lib/
-lib64/
 parts/
+lib64/
 sdist/
 var/
 wheels/
@@ -44,3 +44,4 @@ htmlcov/
 # SQLite databases
 *.db
 test.db 
+

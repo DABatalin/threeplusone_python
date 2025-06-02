@@ -2,8 +2,8 @@ import pytest
 from fastapi.testclient import TestClient
 import pytest_asyncio
 
-from app.main import app
 from app.api.deps import get_db
+from app.main import app
 from app.tests.deps import get_test_db, init_test_db
 
 app.dependency_overrides[get_db] = get_test_db
