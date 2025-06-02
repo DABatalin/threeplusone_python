@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
     
+    # ClickHouse settings
+    CLICKHOUSE_HOST: str = "localhost"
+    CLICKHOUSE_PORT: int = 8123
+    
     class Config:
         case_sensitive = True
         env_file = ".env"

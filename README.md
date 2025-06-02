@@ -12,6 +12,7 @@
 - Поиск по товарам, продавцам и комментариям через Elasticsearch
 - Аналитика с использованием ClickHouse и Apache Kafka
 - Мониторинг системы через Prometheus и Grafana
+- Автоматические тесты для всех основных функций API
 
 ## Технологический стек
 
@@ -22,6 +23,7 @@
 - **Очереди сообщений**: Apache Kafka
 - **Аналитика**: ClickHouse
 - **Мониторинг**: Prometheus, Grafana
+- **Тестирование**: Pytest
 - **Контейнеризация**: Docker, Docker Compose
 
 ## Начало работы
@@ -103,15 +105,17 @@ docker-compose up --build
 ## Структура проекта
 
 ```
-app/
-├── api/              # API endpoints
-│   └── v1/          # API версии 1
-├── core/            # Основные настройки и конфигурация
-├── crud/            # CRUD операции
-├── db/              # Настройки базы данных
-├── models/          # SQLAlchemy модели
-├── schemas/         # Pydantic схемы
-└── services/        # Сервисные слои (S3, Elasticsearch и т.д.)
+
+├── app/                    # Основной код приложения
+│   ├── api/                # API endpoints
+│   ├── core/               # Основные настройки и конфигурация
+│   ├── crud/               # CRUD операции
+│   ├── db/                 # Настройки базы данных
+│   ├── models/             # SQLAlchemy модели
+│   ├── schemas/            # Pydantic схемы
+│   ├── services/           # Сервисные слои
+│   ├── tests/              # Автоматические тесты
+│   └── main.py             # Точка входа в приложение
 ```
 
 ## API Endpoints
@@ -164,7 +168,17 @@ pip install -r requirements.txt
 
 ### Запуск тестов
 ```bash
+# Запуск всех тестов
 pytest
+
+# Запуск конкретного модуля тестов
+pytest app/tests/test_auth.py
+
+# Запуск тестов с подробным выводом
+pytest -v
+
+# Запуск тестов с выводом print statements
+pytest -s
 ```
 
 ### Форматирование кода
@@ -183,4 +197,116 @@ flake8
 2. Баталин Дмитрий - техлид, бекенд
 3. Драновский Иван - S3 база данных, метрики
 4. Елизавета Николаева - kafka, apache spark
+
+## Тестирование Kafka
+
+Для проверки работоспособности Kafka используется скрипт `tests/kafka_test.py`. Скрипт проверяет:
+
+1. Работу Producer:
+   - Отправляет 5 тестовых сообщений в топик "test-topic"
+   - Каждое сообщение содержит ID, текст и временную метку
+   - Выводит подтверждение доставки каждого сообщения
+
+2. Работу Consumer:
+   - Подписывается на топик "test-topic"
+   - Пытается получить сообщения в течение 30 секунд
+   - Выводит содержимое полученных сообщений
+   - Останавливается после получения всех 5 тестовых сообщений
+
+### Запуск теста Kafka
+
+```bash
+# Убедитесь, что Kafka запущена
+python tests/kafka_test.py
+```
+
+Успешное выполнение теста подтверждает:
+- Доступность Kafka брокера
+- Возможность создания топиков
+- Корректную работу producer и consumer
+- Правильную сериализацию/десериализацию сообщений
+
+## Аналитическая система
+
+Проект включает комплексную систему аналитики, использующую Apache Spark для обработки данных и синхронизации между PostgreSQL и ClickHouse.
+
+### Архитектура аналитической системы
+
+1. **Источники данных**:
+   - PostgreSQL (основная БД)
+   - Kafka (потоковые данные о действиях пользователей)
+
+2. **Обработка данных**:
+   - Apache Spark для ETL процессов
+   - Airflow для оркестрации и планирования задач
+
+3. **Хранение аналитических данных**:
+   - ClickHouse (OLAP база данных)
+
+### Spark Jobs
+
+1. **Historical Migration** (`spark/jobs/historical_migration.py`):
+   - Единоразовая миграция исторических данных из PostgreSQL в ClickHouse
+   - Полная синхронизация всех необходимых таблиц
+
+2. **Incremental Sync** (`spark/jobs/incremental_sync.py`):
+   - Регулярная синхронизация новых данных
+   - Отслеживание изменений по временным меткам
+   - Обработка только новых или измененных записей
+
+3. **Data Aggregation** (`spark/jobs/data_aggregation.py`):
+   - Агрегация данных о продажах
+   - Анализ активности пользователей
+   - Создание аналитических срезов
+
+### Airflow DAGs
+
+1. **Data Sync and Aggregation** (Hourly):
+   ```
+   data_sync_and_aggregation_dag
+   ├── incremental_sync_task
+   ├── data_aggregation_task
+   └── data_quality_check_task
+   ```
+
+2. **Historical Migration** (One-time):
+   ```
+   historical_data_migration_dag
+   ├── migration_task
+   └── validation_task
+   ```
+
+### Аналитические таблицы в ClickHouse
+
+1. **daily_sales_aggregation**:
+   - Ежедневные агрегаты по продажам
+   - Группировка по категориям товаров
+   - Статистика по продавцам
+
+2. **user_activity_aggregation**:
+   - Метрики активности пользователей
+   - Статистика просмотров товаров
+   - Конверсия в покупки
+
+### Запуск аналитической системы
+
+1. Запуск всех сервисов:
+```bash
+docker-compose up -d
+```
+
+2. Проверка статуса сервисов:
+```bash
+docker-compose ps
+```
+
+3. Запуск исторической миграции:
+```bash
+airflow trigger_dag historical_data_migration_dag
+```
+
+4. Мониторинг:
+- Airflow UI: http://localhost:8080
+- Spark UI: http://localhost:4040
+- ClickHouse UI: http://localhost:8123
 
