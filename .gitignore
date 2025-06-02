@@ -12,8 +12,8 @@ downloads/
 eggs/
 .eggs/
 lib/
-lib64/
 parts/
+lib64/
 sdist/
 var/
 wheels/
@@ -37,7 +37,6 @@ ENV/
 # Logs
 *.log
 
-# Local development
 .env
 .env.local
 
@@ -72,3 +71,10 @@ minio/data/
 
 # Kafka
 kafka/data/
+.DS_Store
+.coverage
+htmlcov/
+
+# SQLite databases
+*.db
+test.db 

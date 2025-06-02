@@ -11,6 +11,8 @@
 - Хранение изображений товаров в MinIO
 - Поиск по товарам, продавцам и комментариям через Elasticsearch
 - Аналитика с использованием ClickHouse и Apache Kafka
+- Мониторинг системы через Prometheus и Grafana
+- Автоматические тесты для всех основных функций API
 
 ## Технологический стек
 
@@ -20,6 +22,8 @@
 - **Поиск**: Elasticsearch
 - **Очереди сообщений**: Apache Kafka
 - **Аналитика**: ClickHouse
+- **Мониторинг**: Prometheus, Grafana
+- **Тестирование**: Pytest
 - **Контейнеризация**: Docker, Docker Compose
 
 ## Начало работы
@@ -76,19 +80,42 @@ docker-compose up --build
 - API: http://localhost:8000
 - Swagger документация: http://localhost:8000/docs
 - MinIO консоль: http://localhost:9001 (login: minioadmin, password: minioadmin)
+- Grafana: http://localhost:3000 (login: admin, password: admin)
+- Prometheus: http://localhost:9090
+
+## Мониторинг
+
+Система включает в себя комплексный мониторинг с использованием Prometheus и Grafana:
+
+### Prometheus
+- Собирает метрики приложения
+- Доступен по адресу http://localhost:9090
+- Настроен на сбор метрик FastAPI приложения
+
+### Grafana
+- Доступна по адресу http://localhost:3000
+- Логин: admin
+- Пароль: admin
+- Предустановленные дашборды:
+  - Application_info 
+  - Request_info
+
+Дашборды хранятся в формате JSON в директории `grafana/dashboards/json/` и автоматически загружаются при старте Grafana.
 
 ## Структура проекта
 
 ```
-app/
-├── api/              # API endpoints
-│   └── v1/          # API версии 1
-├── core/            # Основные настройки и конфигурация
-├── crud/            # CRUD операции
-├── db/              # Настройки базы данных
-├── models/          # SQLAlchemy модели
-├── schemas/         # Pydantic схемы
-└── services/        # Сервисные слои (S3, Elasticsearch и т.д.)
+
+├── app/                    # Основной код приложения
+│   ├── api/                # API endpoints
+│   ├── core/               # Основные настройки и конфигурация
+│   ├── crud/               # CRUD операции
+│   ├── db/                 # Настройки базы данных
+│   ├── models/             # SQLAlchemy модели
+│   ├── schemas/            # Pydantic схемы
+│   ├── services/           # Сервисные слои
+│   ├── tests/              # Автоматические тесты
+│   └── main.py             # Точка входа в приложение
 ```
 
 ## API Endpoints
@@ -141,7 +168,17 @@ pip install -r requirements.txt
 
 ### Запуск тестов
 ```bash
+# Запуск всех тестов
 pytest
+
+# Запуск конкретного модуля тестов
+pytest app/tests/test_auth.py
+
+# Запуск тестов с подробным выводом
+pytest -v
+
+# Запуск тестов с выводом print statements
+pytest -s
 ```
 
 ### Форматирование кода
