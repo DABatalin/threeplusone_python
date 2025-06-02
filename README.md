@@ -12,6 +12,7 @@
 - Поиск по товарам, продавцам и комментариям через Elasticsearch
 - Аналитика с использованием ClickHouse и Apache Kafka
 - Мониторинг системы через Prometheus и Grafana
+- Автоматические тесты для всех основных функций API
 
 ## Технологический стек
 
@@ -22,6 +23,7 @@
 - **Очереди сообщений**: Apache Kafka
 - **Аналитика**: ClickHouse
 - **Мониторинг**: Prometheus, Grafana
+- **Тестирование**: Pytest
 - **Контейнеризация**: Docker, Docker Compose
 
 ## Начало работы
@@ -103,15 +105,17 @@ docker-compose up --build
 ## Структура проекта
 
 ```
-app/
-├── api/              # API endpoints
-│   └── v1/          # API версии 1
-├── core/            # Основные настройки и конфигурация
-├── crud/            # CRUD операции
-├── db/              # Настройки базы данных
-├── models/          # SQLAlchemy модели
-├── schemas/         # Pydantic схемы
-└── services/        # Сервисные слои (S3, Elasticsearch и т.д.)
+
+├── app/                    # Основной код приложения
+│   ├── api/                # API endpoints
+│   ├── core/               # Основные настройки и конфигурация
+│   ├── crud/               # CRUD операции
+│   ├── db/                 # Настройки базы данных
+│   ├── models/             # SQLAlchemy модели
+│   ├── schemas/            # Pydantic схемы
+│   ├── services/           # Сервисные слои
+│   ├── tests/              # Автоматические тесты
+│   └── main.py             # Точка входа в приложение
 ```
 
 ## API Endpoints
@@ -164,7 +168,17 @@ pip install -r requirements.txt
 
 ### Запуск тестов
 ```bash
+# Запуск всех тестов
 pytest
+
+# Запуск конкретного модуля тестов
+pytest app/tests/test_auth.py
+
+# Запуск тестов с подробным выводом
+pytest -v
+
+# Запуск тестов с выводом print statements
+pytest -s
 ```
 
 ### Форматирование кода
