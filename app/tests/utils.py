@@ -16,7 +16,6 @@ def create_test_user(client: TestClient) -> Dict:
     return response.json()
 
 def create_test_superuser(client: TestClient) -> Dict:
-    # First create a regular user
     user_data = {
         "email": "admin@example.com",
         "password": "admin123",
@@ -31,7 +30,6 @@ def create_test_superuser(client: TestClient) -> Dict:
     return response.json()
 
 def get_user_token_headers(client: TestClient) -> Dict[str, str]:
-    # First create a user
     create_test_user(client)
     
     login_data = {
@@ -47,7 +45,6 @@ def get_user_token_headers(client: TestClient) -> Dict[str, str]:
     return {"Authorization": f"Bearer {tokens['access_token']}"}
 
 def get_superuser_token_headers(client: TestClient) -> Dict[str, str]:
-    # First create a superuser
     create_test_superuser(client)
     
     login_data = {
@@ -63,7 +60,6 @@ def get_superuser_token_headers(client: TestClient) -> Dict[str, str]:
     return {"Authorization": f"Bearer {tokens['access_token']}"}
 
 def create_test_product(client: TestClient, superuser_token_headers: Dict[str, str]) -> Dict:
-    # First create a test seller
     seller_data = {
         "name": "Test Seller",
         "email": "seller@example.com",
@@ -79,7 +75,6 @@ def create_test_product(client: TestClient, superuser_token_headers: Dict[str, s
         raise Exception(f"Failed to create test seller: {seller_response.json()}")
     seller = seller_response.json()
 
-    # Then create a test product
     product_data = {
         "name": "Test Product",
         "description": "A test product",
